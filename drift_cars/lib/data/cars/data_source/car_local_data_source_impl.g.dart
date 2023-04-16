@@ -27,6 +27,12 @@ class $CarDtoTable extends CarDto with TableInfo<$CarDtoTable, CarDtoData> {
   late final GeneratedColumn<String> model = GeneratedColumn<String>(
       'model', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _kilometersMeta =
+      const VerificationMeta('kilometers');
+  @override
+  late final GeneratedColumn<int> kilometers = GeneratedColumn<int>(
+      'kilometers', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _registrationDateMeta =
       const VerificationMeta('registrationDate');
   @override
@@ -34,7 +40,8 @@ class $CarDtoTable extends CarDto with TableInfo<$CarDtoTable, CarDtoData> {
       GeneratedColumn<DateTime>('registration_date', aliasedName, false,
           type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns => [id, make, model, registrationDate];
+  List<GeneratedColumn> get $columns =>
+      [id, make, model, kilometers, registrationDate];
   @override
   String get aliasedName => _alias ?? 'car_dto';
   @override
@@ -59,6 +66,14 @@ class $CarDtoTable extends CarDto with TableInfo<$CarDtoTable, CarDtoData> {
     } else if (isInserting) {
       context.missing(_modelMeta);
     }
+    if (data.containsKey('kilometers')) {
+      context.handle(
+          _kilometersMeta,
+          kilometers.isAcceptableOrUnknown(
+              data['kilometers']!, _kilometersMeta));
+    } else if (isInserting) {
+      context.missing(_kilometersMeta);
+    }
     if (data.containsKey('registration_date')) {
       context.handle(
           _registrationDateMeta,
@@ -82,6 +97,8 @@ class $CarDtoTable extends CarDto with TableInfo<$CarDtoTable, CarDtoData> {
           .read(DriftSqlType.string, data['${effectivePrefix}make'])!,
       model: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}model'])!,
+      kilometers: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}kilometers'])!,
       registrationDate: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}registration_date'])!,
     );
@@ -97,11 +114,13 @@ class CarDtoData extends DataClass implements Insertable<CarDtoData> {
   final int id;
   final String make;
   final String model;
+  final int kilometers;
   final DateTime registrationDate;
   const CarDtoData(
       {required this.id,
       required this.make,
       required this.model,
+      required this.kilometers,
       required this.registrationDate});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -109,6 +128,7 @@ class CarDtoData extends DataClass implements Insertable<CarDtoData> {
     map['id'] = Variable<int>(id);
     map['make'] = Variable<String>(make);
     map['model'] = Variable<String>(model);
+    map['kilometers'] = Variable<int>(kilometers);
     map['registration_date'] = Variable<DateTime>(registrationDate);
     return map;
   }
@@ -118,6 +138,7 @@ class CarDtoData extends DataClass implements Insertable<CarDtoData> {
       id: Value(id),
       make: Value(make),
       model: Value(model),
+      kilometers: Value(kilometers),
       registrationDate: Value(registrationDate),
     );
   }
@@ -129,6 +150,7 @@ class CarDtoData extends DataClass implements Insertable<CarDtoData> {
       id: serializer.fromJson<int>(json['id']),
       make: serializer.fromJson<String>(json['make']),
       model: serializer.fromJson<String>(json['model']),
+      kilometers: serializer.fromJson<int>(json['kilometers']),
       registrationDate: serializer.fromJson<DateTime>(json['registrationDate']),
     );
   }
@@ -139,16 +161,22 @@ class CarDtoData extends DataClass implements Insertable<CarDtoData> {
       'id': serializer.toJson<int>(id),
       'make': serializer.toJson<String>(make),
       'model': serializer.toJson<String>(model),
+      'kilometers': serializer.toJson<int>(kilometers),
       'registrationDate': serializer.toJson<DateTime>(registrationDate),
     };
   }
 
   CarDtoData copyWith(
-          {int? id, String? make, String? model, DateTime? registrationDate}) =>
+          {int? id,
+          String? make,
+          String? model,
+          int? kilometers,
+          DateTime? registrationDate}) =>
       CarDtoData(
         id: id ?? this.id,
         make: make ?? this.make,
         model: model ?? this.model,
+        kilometers: kilometers ?? this.kilometers,
         registrationDate: registrationDate ?? this.registrationDate,
       );
   @override
@@ -157,13 +185,15 @@ class CarDtoData extends DataClass implements Insertable<CarDtoData> {
           ..write('id: $id, ')
           ..write('make: $make, ')
           ..write('model: $model, ')
+          ..write('kilometers: $kilometers, ')
           ..write('registrationDate: $registrationDate')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, make, model, registrationDate);
+  int get hashCode =>
+      Object.hash(id, make, model, kilometers, registrationDate);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -171,6 +201,7 @@ class CarDtoData extends DataClass implements Insertable<CarDtoData> {
           other.id == this.id &&
           other.make == this.make &&
           other.model == this.model &&
+          other.kilometers == this.kilometers &&
           other.registrationDate == this.registrationDate);
 }
 
@@ -178,31 +209,37 @@ class CarDtoCompanion extends UpdateCompanion<CarDtoData> {
   final Value<int> id;
   final Value<String> make;
   final Value<String> model;
+  final Value<int> kilometers;
   final Value<DateTime> registrationDate;
   const CarDtoCompanion({
     this.id = const Value.absent(),
     this.make = const Value.absent(),
     this.model = const Value.absent(),
+    this.kilometers = const Value.absent(),
     this.registrationDate = const Value.absent(),
   });
   CarDtoCompanion.insert({
     this.id = const Value.absent(),
     required String make,
     required String model,
+    required int kilometers,
     required DateTime registrationDate,
   })  : make = Value(make),
         model = Value(model),
+        kilometers = Value(kilometers),
         registrationDate = Value(registrationDate);
   static Insertable<CarDtoData> custom({
     Expression<int>? id,
     Expression<String>? make,
     Expression<String>? model,
+    Expression<int>? kilometers,
     Expression<DateTime>? registrationDate,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (make != null) 'make': make,
       if (model != null) 'model': model,
+      if (kilometers != null) 'kilometers': kilometers,
       if (registrationDate != null) 'registration_date': registrationDate,
     });
   }
@@ -211,11 +248,13 @@ class CarDtoCompanion extends UpdateCompanion<CarDtoData> {
       {Value<int>? id,
       Value<String>? make,
       Value<String>? model,
+      Value<int>? kilometers,
       Value<DateTime>? registrationDate}) {
     return CarDtoCompanion(
       id: id ?? this.id,
       make: make ?? this.make,
       model: model ?? this.model,
+      kilometers: kilometers ?? this.kilometers,
       registrationDate: registrationDate ?? this.registrationDate,
     );
   }
@@ -232,6 +271,9 @@ class CarDtoCompanion extends UpdateCompanion<CarDtoData> {
     if (model.present) {
       map['model'] = Variable<String>(model.value);
     }
+    if (kilometers.present) {
+      map['kilometers'] = Variable<int>(kilometers.value);
+    }
     if (registrationDate.present) {
       map['registration_date'] = Variable<DateTime>(registrationDate.value);
     }
@@ -244,6 +286,7 @@ class CarDtoCompanion extends UpdateCompanion<CarDtoData> {
           ..write('id: $id, ')
           ..write('make: $make, ')
           ..write('model: $model, ')
+          ..write('kilometers: $kilometers, ')
           ..write('registrationDate: $registrationDate')
           ..write(')'))
         .toString();

@@ -15,6 +15,10 @@ part 'car_local_data_source_impl.g.dart';
 
 final carLocalDataSourceProvider = Provider((_) => CarLocalDataSourceImpl());
 
+final getCarsProvider = FutureProvider<List<CarDtoData>>((ref) {
+  return ref.read(carLocalDataSourceProvider).getCars();
+});
+
 @DriftDatabase(tables: [CarDto])
 class CarLocalDataSourceImpl extends _$CarLocalDataSourceImpl implements CarLocalDataSource {
   CarLocalDataSourceImpl() : super(_openConnection());
@@ -23,19 +27,28 @@ class CarLocalDataSourceImpl extends _$CarLocalDataSourceImpl implements CarLoca
   int get schemaVersion => 1;
 
   @override
-  Future<void> addCar(Car car) {
-    // TODO: implement addCar
-    throw UnimplementedError();
+  Future<void> addCar(Car car) async {
+    await into(carDto).insert(
+      CarDtoCompanion.insert(
+        make: car.make,
+        model: car.model,
+        kilometers: car.kilometers,
+        registrationDate: car.registrationDate,
+      ),
+    );
   }
+
+  @override
+  Future<List<CarDtoData>> getCars() => select(carDto).get();
 }
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
-    //for dev - delete db on every restart
+    //TODO: remove again in production - for dev only - delete db on every restart
     if (kDebugMode && await file.exists()) {
-      await file.delete();
+      //await file.delete();
     }
     return NativeDatabase.createInBackground(file, logStatements: true);
   });
