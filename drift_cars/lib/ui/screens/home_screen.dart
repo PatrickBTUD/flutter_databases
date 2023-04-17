@@ -14,6 +14,14 @@ class HomeScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Drift Cars Demo App'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              AutoRouter.of(context).navigate(const DBViewerRoute());
+            },
+            icon: const Icon(Icons.table_rows_outlined),
+          ),
+        ],
       ),
       body: carsStream.when(
         data: (data) => ListView.builder(

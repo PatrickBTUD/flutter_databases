@@ -11,6 +11,7 @@ dependencies:
   auto_route: ^6.2.0
   cupertino_icons: ^1.0.5
   drift: ^2.7.0
+  drift_db_viewer: ^2.0.0
   flutter:
     sdk: flutter
   flutter_localizations:
