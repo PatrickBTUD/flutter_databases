@@ -19,6 +19,8 @@ final getCarsProvider = FutureProvider<List<CarDtoData>>((ref) {
   return ref.read(carLocalDataSourceProvider).getCars();
 });
 
+final carsStreamProvider = StreamProvider((ref) => ref.read(carLocalDataSourceProvider).carsStream);
+
 @DriftDatabase(tables: [CarDto])
 class CarLocalDataSourceImpl extends _$CarLocalDataSourceImpl implements CarLocalDataSource {
   CarLocalDataSourceImpl() : super(_openConnection());
@@ -40,6 +42,9 @@ class CarLocalDataSourceImpl extends _$CarLocalDataSourceImpl implements CarLoca
 
   @override
   Future<List<CarDtoData>> getCars() => select(carDto).get();
+
+  @override
+  Stream<List<CarDtoData>> get carsStream => select(carDto).watch();
 }
 
 LazyDatabase _openConnection() {
