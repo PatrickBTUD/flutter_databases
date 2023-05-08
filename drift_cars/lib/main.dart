@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         title: 'Flutter Demo',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: Colors.teal,
         ),
         routerConfig: _appRouter.config(),
         localizationsDelegates: const [

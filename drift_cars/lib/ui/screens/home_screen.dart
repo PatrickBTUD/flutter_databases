@@ -17,6 +17,7 @@ class HomeScreen extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () {
+              ref.read(carLocalDataSourceProvider).advancedQueries();
               AutoRouter.of(context).navigate(const DBViewerRoute());
             },
             icon: const Icon(Icons.table_rows_outlined),

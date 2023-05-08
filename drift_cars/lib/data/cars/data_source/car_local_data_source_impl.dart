@@ -45,13 +45,31 @@ class CarLocalDataSourceImpl extends _$CarLocalDataSourceImpl implements CarLoca
 
   @override
   Stream<List<CarDtoData>> get carsStream => select(carDto).watch();
+
+  void advancedQueries() async {
+    //limit for pagination
+    final limited = await (select(carDto)..limit(10, offset: 2)).get();
+    print(limited.length);
+
+    //orderBy asc/desc
+    final orderedList = await (select(carDto)
+          ..orderBy([(t) => OrderingTerm(expression: t.kilometers, mode: OrderingMode.asc)]))
+        .get();
+    for (var entry in orderedList) {
+      print(entry.toString());
+    }
+
+    //if we know where exists only one entry -> single value
+    final singleValue = await (select(carDto)..where((tbl) => tbl.model.equals('Golf'))).getSingle();
+    print(singleValue.toString());
+  }
 }
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
-    //TODO: remove again in production - for dev only - delete db on every restart
+    //TODO: remove me in production - for dev only - delete db on every restart
     if (kDebugMode && await file.exists()) {
       //await file.delete();
     }
