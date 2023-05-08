@@ -1,6 +1,11 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:realm/realm.dart';
 import 'package:realm_cars/data/cars/car_dto.dart';
 import 'package:realm_cars/data/cars/datasource/car_local_data_source.dart';
+
+final carProvider = Provider<CarLocalDataSource>((_) => CarLocalDataSourceImpl());
+
+final carStreamProvider = StreamProvider((ref) => ref.watch(carProvider).watchCars());
 
 class CarLocalDataSourceImpl extends CarLocalDataSource {
   final config = Configuration.local([CarDto.schema]);
@@ -18,5 +23,22 @@ class CarLocalDataSourceImpl extends CarLocalDataSource {
   @override
   Stream<List<CarDto>> watchCars() {
     return realm.all<CarDto>().changes.map((event) => event.results.toList());
+  }
+
+  @override
+  void addCar({
+    required String make,
+    required String model,
+    required int kilometers,
+    required DateTime registrationDate,
+  }) {
+    realm.write(() {
+      realm.add(CarDto(
+        make: make,
+        model: model,
+        kilometers: kilometers,
+        registrationDate: registrationDate,
+      ));
+    });
   }
 }
