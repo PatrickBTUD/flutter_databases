@@ -21,7 +21,13 @@ class CarLocalDataSourceImpl extends CarLocalDataSource {
   }
 
   @override
-  Stream<List<CarDto>> watchCars() {
+  Stream<List<CarDto>> watchCars({SortBy? sortBy}) {
+    if (sortBy != null) {
+      final sort = sortBy.value;
+      final result =  realm.query<CarDto>('TRUEPREDICATE SORT($sort ASC)');
+      return result.changes.map((event) => event.results.toList());
+
+    }
     return realm.all<CarDto>().changes.map((event) => event.results.toList());
   }
 
