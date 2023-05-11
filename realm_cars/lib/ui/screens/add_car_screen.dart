@@ -2,7 +2,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:month_year_picker/month_year_picker.dart';
 import 'package:realm_cars/data/cars/datasource/car_local_data_source_impl.dart';
 
 @RoutePage()
@@ -16,7 +15,8 @@ class AddCarScreen extends HookConsumerWidget {
     final makeController = useTextEditingController();
     final modelController = useTextEditingController();
     final kilometersController = useTextEditingController();
-    final registrationController = useTextEditingController();
+    final registrationMonthController = useTextEditingController();
+    final registrationYearController = useTextEditingController();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add a new car'),
@@ -65,31 +65,40 @@ class AddCarScreen extends HookConsumerWidget {
                   return null;
                 },
               ),
-              TextButton(
-                onPressed: () async {
-                  final selected = await showMonthYearPicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(1886),
-                    lastDate: DateTime.now(),
-                  );
-                  registrationController.text = selected?.toIso8601String() ?? '';
-                },
-                child: const Text('Add Registration'),
-              ),
-              TextFormField(
-                controller: registrationController,
-                enabled: false,
-                decoration: const InputDecoration(
-                  helperText: 'Registration date',
-                ),
-                keyboardType: TextInputType.datetime,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Registration date should not be empty';
-                  }
-                  return null;
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: registrationMonthController,
+                      decoration: const InputDecoration(
+                        helperText: 'Registration month',
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value?.isEmpty ?? true) {
+                          return 'Registration month should not be empty';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12.0),
+                  Expanded(
+                    child: TextFormField(
+                      controller: registrationYearController,
+                      decoration: const InputDecoration(
+                        helperText: 'Registration year',
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value?.isEmpty ?? true) {
+                          return 'Registration date should not be empty';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -107,7 +116,10 @@ class AddCarScreen extends HookConsumerWidget {
                               make: makeController.text,
                               model: modelController.text,
                               kilometers: int.parse(kilometersController.text),
-                              registrationDate: DateTime.parse(registrationController.text),
+                              registrationDate: DateTime(
+                                int.parse(registrationYearController.text),
+                                int.parse(registrationMonthController.text),
+                              ),
                             );
                         AutoRouter.of(context).pop();
                       }
