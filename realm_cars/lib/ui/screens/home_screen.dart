@@ -79,16 +79,31 @@ class HomeScreen extends ConsumerWidget {
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(data[index].make ?? ''),
-                                Text(data[index].model ?? ''),
-                                Text(
-                                    '${((data[index].kilometers ?? 0) / 1000).toStringAsFixed(1)} tsd. km'),
-                                Text(
-                                    '${data[index].registrationDate?.month}/${data[index].registrationDate?.year}'),
-                              ],
+                            child: Dismissible(
+                              key: Key(data[index].id.toString()),
+                              onDismissed: (_) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Deleted: ${data[index].toString()}')));
+                                ref.read(carProvider).deleteCar(car: data[index]);
+                              },
+                              background: Container(
+                                color: Colors.red,
+                                child: Text(
+                                  'Deleting...: ${data[index].toString()}',
+                                  style: const TextStyle(color: Colors.white, fontSize: 16.0),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(data[index].make ?? ''),
+                                  Text(data[index].model ?? ''),
+                                  Text(
+                                      '${((data[index].kilometers ?? 0) / 1000).toStringAsFixed(1)} tsd. km'),
+                                  Text(
+                                      '${data[index].registrationDate?.month}/${data[index].registrationDate?.year}'),
+                                ],
+                              ),
                             ),
                           ),
                         );

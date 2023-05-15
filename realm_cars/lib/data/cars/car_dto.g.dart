@@ -7,12 +7,14 @@ part of 'car_dto.dart';
 // **************************************************************************
 
 class CarDto extends _CarDto with RealmEntity, RealmObjectBase, RealmObject {
-  CarDto({
+  CarDto(
+    ObjectId id, {
     String? make,
     String? model,
     int? kilometers,
     DateTime? registrationDate,
   }) {
+    RealmObjectBase.set(this, 'id', id);
     RealmObjectBase.set(this, 'make', make);
     RealmObjectBase.set(this, 'model', model);
     RealmObjectBase.set(this, 'kilometers', kilometers);
@@ -20,6 +22,11 @@ class CarDto extends _CarDto with RealmEntity, RealmObjectBase, RealmObject {
   }
 
   CarDto._();
+
+  @override
+  ObjectId get id => RealmObjectBase.get<ObjectId>(this, 'id') as ObjectId;
+  @override
+  set id(ObjectId value) => RealmObjectBase.set(this, 'id', value);
 
   @override
   String? get make => RealmObjectBase.get<String>(this, 'make') as String?;
@@ -55,6 +62,7 @@ class CarDto extends _CarDto with RealmEntity, RealmObjectBase, RealmObject {
   static SchemaObject _initSchema() {
     RealmObjectBase.registerFactory(CarDto._);
     return const SchemaObject(ObjectType.realmObject, CarDto, 'CarDto', [
+      SchemaProperty('id', RealmPropertyType.objectid, primaryKey: true),
       SchemaProperty('make', RealmPropertyType.string, optional: true),
       SchemaProperty('model', RealmPropertyType.string, optional: true),
       SchemaProperty('kilometers', RealmPropertyType.int, optional: true),

@@ -54,6 +54,7 @@ class CarLocalDataSourceImpl extends CarLocalDataSource {
   }) {
     realm.write(() {
       realm.add(CarDto(
+        ObjectId(),
         make: make,
         model: model,
         kilometers: kilometers,
@@ -69,6 +70,13 @@ class CarLocalDataSourceImpl extends CarLocalDataSource {
   }) {
     realm.write(() {
       car.kilometers = (car.kilometers ?? 0) + addKilometers;
+    });
+  }
+
+  @override
+  void deleteCar({required CarDto car}) {
+    realm.write(() {
+      realm.delete(car);
     });
   }
 }

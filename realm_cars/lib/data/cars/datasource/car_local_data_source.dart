@@ -35,4 +35,8 @@ abstract class CarLocalDataSource {
     required CarDto car,
     required int addKilometers,
   });
+
+  void deleteCar({
+    required CarDto car,
+  });
 }

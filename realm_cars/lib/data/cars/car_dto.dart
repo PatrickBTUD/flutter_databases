@@ -4,6 +4,9 @@ part 'car_dto.g.dart';
 
 @RealmModel()
 class _CarDto {
+  @PrimaryKey()
+  late ObjectId id;
+
   late String? make;
 
   late String? model;
