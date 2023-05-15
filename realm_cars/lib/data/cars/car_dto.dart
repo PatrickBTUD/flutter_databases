@@ -11,4 +11,11 @@ class _CarDto {
   late int? kilometers;
 
   late DateTime? registrationDate;
+
+  @override
+  String toString() {
+    return 'CarDto{make: $make, model: $model, kilometers: '
+        '${((kilometers ?? 0)/1000).toStringAsFixed(1)} tsd. km, registrationDate: '
+        '${registrationDate?.month}/${registrationDate?.year}';
+  }
 }

@@ -12,61 +12,95 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final carStream = ref.watch(carProvider).watchCars(sortBy: SortBy.registrationDate);
+    final carStream = ref.watch(carProvider).watchCars(sortBy: SortBy.kilometers);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Realm Demo'),
       ),
-      body: StreamBuilder<List<CarDto>>(
-        stream: carStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.connectionState == ConnectionState.active) {
-            if (snapshot.hasData) {
-              final data = snapshot.data ?? [];
-              return ListView.builder(
-                itemCount: data.length + 1,
-                itemBuilder: (context, index) {
-                  if (data.isEmpty) {
-                    return const Center(
-                      child: Text('No cars available'),
-                    );
-                  }
-                  if (index == 0) {
-                    return const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Make'),
-                          Text('Model'),
-                          Text('Mileage'),
-                          Text('Registration date'),
-                        ],
-                      ),
-                    );
-                  }
-                  index -= 1;
-                  return Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(data[index].make ?? ''),
-                        Text(data[index].model ?? ''),
-                        Text('${data[index].kilometers ?? 0 / 1000} tsd. km'),
-                        Text(
-                            '${data[index].registrationDate?.month}/${data[index].registrationDate?.year}'),
-                      ],
-                    ),
-                  );
+      body: Column(
+        children: [
+          Row(
+            children: [
+              TextButton(
+                onPressed: () {
+                  final result = ref.watch(carProvider).getHighestKilometers();
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(result.toString())));
                 },
-              );
-            }
-          }
-          return const Center(child: Text('No cars available'));
-        },
+                child: const Text('Get highest km'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final result = ref.watch(carProvider).getLowestKilometers();
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text(result.toString())));
+                },
+                child: const Text('Get lowest km'),
+              )
+            ],
+          ),
+          Expanded(
+            child: StreamBuilder<List<CarDto>>(
+              stream: carStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.connectionState == ConnectionState.active) {
+                  if (snapshot.hasData) {
+                    final data = snapshot.data ?? [];
+                    return ListView.builder(
+                      itemCount: data.length + 1,
+                      itemBuilder: (context, index) {
+                        if (data.isEmpty) {
+                          return const Center(
+                            child: Text('No cars available'),
+                          );
+                        }
+                        if (index == 0) {
+                          return const Padding(
+                            padding: EdgeInsets.all(12.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Make'),
+                                Text('Model'),
+                                Text('Mileage'),
+                                Text('Registration date'),
+                              ],
+                            ),
+                          );
+                        }
+                        index -= 1;
+                        return GestureDetector(
+                          onTap: () {
+                            ref
+                                .read(carProvider)
+                                .updateKilometers(car: data[index], addKilometers: 1000);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(data[index].make ?? ''),
+                                Text(data[index].model ?? ''),
+                                Text(
+                                    '${((data[index].kilometers ?? 0) / 1000).toStringAsFixed(1)} tsd. km'),
+                                Text(
+                                    '${data[index].registrationDate?.month}/${data[index].registrationDate?.year}'),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                }
+                return const Center(child: Text('No cars available'));
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),

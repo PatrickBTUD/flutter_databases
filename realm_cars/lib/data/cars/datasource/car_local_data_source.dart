@@ -20,10 +20,19 @@ abstract class CarLocalDataSource {
 
   Stream<List<CarDto>> watchCars({SortBy? sortBy});
 
+  CarDto getHighestKilometers();
+
+  CarDto getLowestKilometers();
+
   void addCar({
     required String make,
     required String model,
     required int kilometers,
     required DateTime registrationDate,
+  });
+
+  void updateKilometers({
+    required CarDto car,
+    required int addKilometers,
   });
 }
