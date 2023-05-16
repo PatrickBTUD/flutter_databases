@@ -5,6 +5,8 @@ import 'package:realm_cars/data/cars/car_dto.dart';
 import 'package:realm_cars/data/cars/datasource/car_local_data_source.dart';
 import 'package:realm_cars/data/cars/datasource/car_local_data_source_impl.dart';
 import 'package:realm_cars/ui/router/app_router.gr.dart';
+import 'package:realm_cars/ui/widgets/car_list_header.dart';
+import 'package:realm_cars/ui/widgets/car_list_tile.dart';
 
 @RoutePage()
 class HomeScreen extends ConsumerWidget {
@@ -57,56 +59,10 @@ class HomeScreen extends ConsumerWidget {
                           );
                         }
                         if (index == 0) {
-                          return const Padding(
-                            padding: EdgeInsets.all(12.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Make'),
-                                Text('Model'),
-                                Text('Mileage'),
-                                Text('Registration date'),
-                              ],
-                            ),
-                          );
+                          return const CarListHeader();
                         }
                         index -= 1;
-                        return GestureDetector(
-                          onTap: () {
-                            ref
-                                .read(carProvider)
-                                .updateKilometers(car: data[index], addKilometers: 1000);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Dismissible(
-                              key: Key(data[index].id.toString()),
-                              onDismissed: (_) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Deleted: ${data[index].toString()}')));
-                                ref.read(carProvider).deleteCar(car: data[index]);
-                              },
-                              background: Container(
-                                color: Colors.red,
-                                child: Text(
-                                  'Deleting...: ${data[index].toString()}',
-                                  style: const TextStyle(color: Colors.white, fontSize: 16.0),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(data[index].make ?? ''),
-                                  Text(data[index].model ?? ''),
-                                  Text(
-                                      '${((data[index].kilometers ?? 0) / 1000).toStringAsFixed(1)} tsd. km'),
-                                  Text(
-                                      '${data[index].registrationDate?.month}/${data[index].registrationDate?.year}'),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
+                        return CarListTile(car: data[index]);
                       },
                     );
                   }
